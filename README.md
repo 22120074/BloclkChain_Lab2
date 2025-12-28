@@ -1,3 +1,10 @@
+# Các địa chỉ Web có thể lấy ETH miễn phí
+
+- **Sepolia POW Faucet:** [https://sepolia-faucet.pk910.de/#/]
+- **Etherium Sepolia Faucet:** [https://cloud.google.com/application/web3/faucet/ethereum/sepolia]
+
+---
+
 # 🚩 Challenge 1: Decentralized Staking App
 
 This is the first challenge of the Speed Run Ethereum curriculum. The goal is to build a **Decentralized Staking App** (similar to Kickstarter) where users can pool funds together to meet a threshold.
@@ -42,12 +49,19 @@ yarn deloy
 yarn start
 ```
 
+```bash
+yarn account
+yarn generate
+```
+
 3. **Test in FE:**
 
 Lấy tiền từ Ví - [Wallet] rồi đến "Stacker UI" và kiểm tra The Contact mà mình deloy lên.
 Hoặc là đi đến Debug Contact để có thểm nhiều thông tin và hàm.
 
 Sau đó bạn có thể Stack tiền vào Stacker Contact, Nếu đến hạn mà đủ quỹ thì Excute, còn không thì nhấn Excute rồi Withdraw để nhận tiền.
+
+---
 
 # 🚩 Challenge 2: 🏵 Token Vendor 🤖
 
@@ -97,6 +111,64 @@ yarn deloy
 yarn start
 ```
 
+```bash
+yarn account
+yarn generate
+```
+
 3. **Test in FE:**
 
 Bạn có thể mua Token hoặc là bán Token cho Vendor, mọi phương thức đều cần ETH. Sau đó nếu bạn là người Owner bạn còn có thể rút tiền từ Vendor về Ví - [Wallet] của mình
+
+---
+
+# 🚩 Challenge 3: 🎲 Dice Game
+
+This is the third challenge of the Speed Run Ethereum curriculum. The goal is to learn about determinism on the blockchain and how to exploit weak randomness to guarantee a win in a gambling contract.
+
+Instead of playing the game manually, you will build an Attacking Contract (RiggedRoll.sol) that predicts the outcome of the dice roll before the transaction is even finalized.
+
+### 🌟 Live Demo
+
+- **Frontend (Vercel):** []
+
+---
+
+## 🚀 Features & Checkpoints Completed
+
+I have successfully completed Checkpoints 1 to 4
+
+---
+
+## 💻 How to Run Locally
+
+1. **Clone the repo & install dependencies:**
+
+```bash
+yarn install
+```
+
+2. **How to run the code:**
+
+```bash
+# CMD 1
+yarn chain
+```
+
+```bash
+# CMD 2
+yarn deloy --reset
+yarn deloy
+```
+
+```bash
+# CMD 3
+yarn start
+```
+
+```bash
+yarn account
+yarn generate
+```
+
+3. **Test in FE:**
