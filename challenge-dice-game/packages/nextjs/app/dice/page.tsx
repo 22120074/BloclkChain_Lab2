@@ -45,13 +45,16 @@ const DiceGame: NextPage = () => {
     ) {
       setIsRolling(false);
 
-      setRolls(
-        rollsHistoryData?.map(({ args }) => ({
-          address: args.player as AddressType,
-          amount: Number(args.amount),
-          roll: (args.roll as bigint).toString(16).toUpperCase(),
-        })) || [],
-      );
+      const mappedRolls =
+        rollsHistoryData
+          ?.filter(event => event !== undefined && event.args !== undefined)
+          ?.map(event => ({
+            address: event.args.player as AddressType,
+            amount: event.args.amount ? Number(event.args.amount) : 0,
+            // Dùng ép kiểu 'any' tạm thời nếu TS vẫn báo lỗi property
+            roll: (event.args.roll as bigint).toString(16).toUpperCase(),
+          })) || [];
+      setRolls(mappedRolls);
     }
   }, [rolls, rollsHistoryData, rollsHistoryLoading]);
 
@@ -69,12 +72,14 @@ const DiceGame: NextPage = () => {
     ) {
       setIsRolling(false);
 
-      setWinners(
-        winnerHistoryData?.map(({ args }) => ({
-          address: args.winner as AddressType,
-          amount: args.amount as bigint,
-        })) || [],
-      );
+      const mappedWinners =
+        winnerHistoryData
+          ?.filter(event => event !== undefined && event.args !== undefined)
+          ?.map(event => ({
+            address: event.args.winner as AddressType,
+            amount: event.args.amount || 0n,
+          })) || [];
+      setWinners(mappedWinners);
     }
   }, [winnerHistoryData, winnerHistoryLoading, winners.length]);
 

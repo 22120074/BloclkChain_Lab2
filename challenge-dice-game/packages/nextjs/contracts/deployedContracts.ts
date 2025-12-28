@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     DiceGame: {
-      address: "0x9A676e781A523b5d0C0e43731313A708CB607508",
+      address: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
       abi: [
         {
           inputs: [],
@@ -102,10 +102,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 3214,
+      deployedOnBlock: 7588,
     },
     RiggedRoll: {
-      address: "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      address: "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
       abi: [
         {
           inputs: [
@@ -240,12 +240,12 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 3216,
+      deployedOnBlock: 7589,
     },
   },
   11155111: {
     DiceGame: {
-      address: "0x241319c0dfa8BcdE7B1C17C8d3E05DB632259a55",
+      address: "0xe88f05C226eDE346bB1aE3C00a55863dd84a8b9b",
       abi: [
         {
           inputs: [],
@@ -340,10 +340,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 9932067,
+      deployedOnBlock: 9932363,
     },
     RiggedRoll: {
-      address: "0xfEfD47DBD357bb3B7Cf0aD3be5642E4B22b66569",
+      address: "0xE8A3D7Bc5714f181e2de13227CF6aCd12f2cCae7",
       abi: [
         {
           inputs: [
@@ -478,7 +478,7 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 9932068,
+      deployedOnBlock: 9932364,
     },
   },
 } as const;
