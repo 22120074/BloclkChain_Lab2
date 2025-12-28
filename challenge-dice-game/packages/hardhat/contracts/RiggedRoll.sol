@@ -34,10 +34,10 @@ contract RiggedRoll is Ownable {
         diceGame.rollTheDice{value: 0.002 ether}();
     }
 
-    function withdraw(address payable _to) public onlyOwner {
+    function withdraw(address payable _to, uint256 _amount) public onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0, "No Ether to withdraw");
-        (bool success, ) = _to.call{value: balance}("");
+        (bool success, ) = _to.call{value: _amount}("");
         require(success, "Withdrawal failed");
     }
 }
