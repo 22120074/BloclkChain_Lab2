@@ -130,13 +130,13 @@ Instead of playing the game manually, you will build an Attacking Contract (Rigg
 
 ### 🌟 Live Demo
 
-- **Frontend (Vercel):** []
+- **Frontend (Vercel):** [https://challenge-dice-game-iota.vercel.app/]
 
 ---
 
 ## 🚀 Features & Checkpoints Completed
 
-I have successfully completed Checkpoints 1 to 4
+I have successfully completed Checkpoints 1 to 6
 
 ---
 
@@ -172,3 +172,9 @@ yarn generate
 ```
 
 3. **Test in FE:**
+
+Đăng nhập vào Ví - [Wallet] trước, sau đó bạn có thể [Roll the dice] để xem có may mắn không, hoặc có thể kiểm soát nó bằng [Rigger Roll]. Nếu thành công thì bạn sẽ nhận được tiền.
+
+Nhưng mà nếu bạn không phải là chủ của Rigger thì không thể rút tiền thưởng đâu.
+
+---
