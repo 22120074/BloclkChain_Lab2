@@ -59,22 +59,22 @@ contract DEX {
     //  **/
 
     // Theo dõi tổng lượng thanh khoản (LPT)
-    uint256 public totalLiquidity; 
+    uint256 public totalLiquidity;
     // Theo dõi số dư LPT của từng user
-    mapping (address => uint256) public liquidity; 
+    mapping(address => uint256) public liquidity;
 
     function init(uint256 tokens) public payable returns (uint256) {
         // 1. Kiểm tra an toàn: Đảm bảo chưa có thanh khoản nào trước đó
         require(totalLiquidity == 0, "DEX: init - already has liquidity");
-        
+
         // 2. Cập nhật tổng thanh khoản bằng số ETH nạp vào
         totalLiquidity = address(this).balance;
         // 3. Ghi nhận người tạo (msg.sender) sở hữu toàn bộ thanh khoản này
         liquidity[msg.sender] = totalLiquidity;
-        
+
         // 4. Chuyển Token từ ví người dùng vào contract DEX
         require(token.transferFrom(msg.sender, address(this), tokens), "DEX: init - transfer failed");
-        
+
         // 5. Trả về tổng thanh khoản
         return totalLiquidity;
     }
@@ -86,12 +86,12 @@ contract DEX {
     function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns (uint256 yOutput) {
         // 1. Tính lượng đầu vào sau khi đã trừ phí 0.3%
         uint256 xInputWithFee = xInput * 997;
-        
+
         // 2. Tử số (Numerator) = Lượng vào (sau phí) * Dự trữ đầu ra
         uint256 numerator = xInputWithFee * yReserves;
         // 3. Mẫu số (Denominator) = (Dự trữ đầu vào * 1000) + Lượng vào (sau phí)
         uint256 denominator = (xReserves * 1000) + xInputWithFee;
-        
+
         // 4. Kết quả = Tử số / Mẫu số
         return numerator / denominator;
     }
@@ -129,6 +129,7 @@ contract DEX {
 
         return tokenOutput;
     }
+
     /**
      * @notice sends $BAL tokens to DEX in exchange for Ether
      */
@@ -147,7 +148,7 @@ contract DEX {
         require(token.transferFrom(msg.sender, address(this), tokenInput), "DEX: transferFrom failed");
 
         // 4. Gửi ETH cho người dùng
-        (bool sent, ) = msg.sender.call{value: ethOutput}("");
+        (bool sent, ) = msg.sender.call{ value: ethOutput }("");
         require(sent, "DEX: ETH transfer failed");
 
         // 5. Emit sự kiện
@@ -162,11 +163,61 @@ contract DEX {
      * NOTE: user has to make sure to give DEX approval to spend their tokens on their behalf by calling approve function prior to this function call.
      * NOTE: Equal parts of both assets will be removed from the user's wallet with respect to the price outlined by the AMM.
      */
-    function deposit() public payable returns (uint256 tokensDeposited) {}
+    function deposit() public payable returns (uint256 tokensDeposited) {
+        require(msg.value > 0, "DEX: Must send ETH to deposit");
+
+        // 1. Tính toán lượng ETH và Token đang có trong bể
+        uint256 ethReserve = address(this).balance - msg.value;
+        uint256 tokenReserve = token.balanceOf(address(this));
+
+        // 2. Tính toán lượng Token cần nạp để giữ nguyên tỷ lệ giá
+        uint256 tokenDeposit = (msg.value * tokenReserve) / ethReserve;
+
+        // 3. Tính toán lượng LP Token sẽ thưởng cho user
+        uint256 liquidityMinted = (msg.value * totalLiquidity) / ethReserve;
+
+        // 4. Cập nhật State
+        liquidity[msg.sender] += liquidityMinted;
+        totalLiquidity += liquidityMinted;
+
+        // 5. Chuyển Token từ user vào DEX
+        require(token.transferFrom(msg.sender, address(this), tokenDeposit), "DEX: deposit transfer failed");
+
+        // 6. Emit Event
+        emit LiquidityProvided(msg.sender, liquidityMinted, msg.value, tokenDeposit);
+
+        return tokenDeposit;
+    }
 
     /**
      * @notice allows withdrawal of $BAL and $ETH from liquidity pool
      * NOTE: with this current code, the msg caller could end up getting very little back if the liquidity is super low in the pool. I guess they could see that with the UI.
      */
-    function withdraw(uint256 amount) public returns (uint256 ethAmount, uint256 tokenAmount) {}
+    function withdraw(uint256 amount) public returns (uint256 ethAmount, uint256 tokenAmount) {
+        require(liquidity[msg.sender] >= amount, "DEX: You do not have enough liquidity to withdraw");
+
+        // 1. Lấy dự trữ hiện tại
+        uint256 ethReserve = address(this).balance;
+        uint256 tokenReserve = token.balanceOf(address(this));
+
+        // 2. Tính toán lượng tiền trả về dựa trên % cổ phần
+        ethAmount = (amount * ethReserve) / totalLiquidity;
+        tokenAmount = (amount * tokenReserve) / totalLiquidity;
+
+        // 3. Cập nhật State (Trừ trước, chuyển tiền sau để tránh Reentrancy)
+        liquidity[msg.sender] -= amount;
+        totalLiquidity -= amount;
+
+        // 4. Chuyển tiền (ETH)
+        (bool sent, ) = msg.sender.call{ value: ethAmount }("");
+        require(sent, "DEX: withdraw failed to send ETH");
+
+        // 5. Chuyển tiền (Token)
+        require(token.transfer(msg.sender, tokenAmount), "DEX: withdraw failed to send tokens");
+
+        // 6. Emit Event
+        emit LiquidityRemoved(msg.sender, amount, tokenAmount, ethAmount);
+
+        return (ethAmount, tokenAmount);
+    }
 }
