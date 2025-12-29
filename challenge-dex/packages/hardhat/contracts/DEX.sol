@@ -102,17 +102,59 @@ contract DEX {
      * NOTE: if you are using a mapping liquidity, then you can use `return liquidity[lp]` to get the liquidity for a user.
      * NOTE: if you will be submitting the challenge make sure to implement this function as it is used in the tests.
      */
-    function getLiquidity(address lp) public view returns (uint256) {}
+    function getLiquidity(address lp) public view returns (uint256) {
+        return liquidity[lp];
+    }
 
     /**
      * @notice sends Ether to DEX in exchange for $BAL
      */
-    function ethToToken() public payable returns (uint256 tokenOutput) {}
+    function ethToToken() public payable returns (uint256 tokenOutput) {
+        require(msg.value > 0, "DEX: cannot swap 0 ETH");
 
+        // 1. Xác định dự trữ
+        // Input Reserve (ETH): Tổng tiền hiện có TRỪ đi số tiền vừa nạp vào
+        uint256 ethReserve = address(this).balance - msg.value;
+        // Output Reserve (Token): Số dư token của contract
+        uint256 tokenReserve = token.balanceOf(address(this));
+
+        // 2. Tính toán lượng token nhận được
+        tokenOutput = price(msg.value, ethReserve, tokenReserve);
+
+        // 3. Chuyển Token cho người dùng
+        require(token.transfer(msg.sender, tokenOutput), "DEX: token transfer failed");
+
+        // 4. Emit sự kiện
+        emit EthToTokenSwap(msg.sender, tokenOutput, msg.value);
+
+        return tokenOutput;
+    }
     /**
      * @notice sends $BAL tokens to DEX in exchange for Ether
      */
-    function tokenToEth(uint256 tokenInput) public returns (uint256 ethOutput) {}
+    function tokenToEth(uint256 tokenInput) public returns (uint256 ethOutput) {
+        require(tokenInput > 0, "DEX: cannot swap 0 tokens");
+
+        // 1. Xác định dự trữ
+        uint256 tokenReserve = token.balanceOf(address(this));
+        uint256 ethReserve = address(this).balance;
+
+        // 2. Tính toán lượng ETH nhận được
+        ethOutput = price(tokenInput, tokenReserve, ethReserve);
+
+        // 3. Lấy Token từ người dùng về Contract
+        // (Người dùng phải Approve trước thì lệnh này mới chạy được)
+        require(token.transferFrom(msg.sender, address(this), tokenInput), "DEX: transferFrom failed");
+
+        // 4. Gửi ETH cho người dùng
+        (bool sent, ) = msg.sender.call{value: ethOutput}("");
+        require(sent, "DEX: ETH transfer failed");
+
+        // 5. Emit sự kiện
+        emit TokenToEthSwap(msg.sender, tokenInput, ethOutput);
+
+        return ethOutput;
+    }
 
     /**
      * @notice allows deposits of $BAL and $ETH to liquidity pool
