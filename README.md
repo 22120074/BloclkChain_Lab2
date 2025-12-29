@@ -186,13 +186,13 @@ Instead of a traditional order book, you will build a smart contract that uses m
 
 ### 🌟 Live Demo
 
-- **Frontend (Vercel):** []
+- **Frontend (Vercel):** [https://challenge-dex-lime.vercel.app/dex]
 
 ---
 
 ## 🚀 Features & Checkpoints Completed
 
-I have successfully completed Checkpoints 1 to 4
+I have successfully completed Checkpoints 1 to 8
 
 - **Alert:**
   Ở Checkpoint 4: Trading 🤝, cần **Aprrove** ở dưới **Ballon** trước khi dùng hàm **tokenToEth**.
