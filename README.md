@@ -192,7 +192,7 @@ Instead of a traditional order book, you will build a smart contract that uses m
 
 ## 🚀 Features & Checkpoints Completed
 
-I have successfully completed Checkpoints 1 to 8
+I have successfully completed Checkpoints 1 to 9
 
 - **Alert:**
   Ở Checkpoint 4: Trading 🤝, cần **Aprrove** ở dưới **Ballon** trước khi dùng hàm **tokenToEth**.
@@ -231,5 +231,7 @@ yarn generate
 ```
 
 3. **Test in FE:**
+
+Đăng nhập vào **Wallet** rồi mua **Liquid** từ **Dex Contact**. Bạn cũng có thể thực hiện các chức năng như biến đổi ETh, Token. **Depoit** và **Withdraw**
 
 ---
