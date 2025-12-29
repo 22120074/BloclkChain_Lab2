@@ -69,7 +69,6 @@ contract DEX {
         
         // 2. Cập nhật tổng thanh khoản bằng số ETH nạp vào
         totalLiquidity = address(this).balance;
-        
         // 3. Ghi nhận người tạo (msg.sender) sở hữu toàn bộ thanh khoản này
         liquidity[msg.sender] = totalLiquidity;
         
@@ -84,7 +83,18 @@ contract DEX {
      * @notice returns yOutput, or yDelta for xInput (or xDelta)
      * @dev Follow along with the [original tutorial](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90) Price section for an understanding of the DEX's pricing model and for a price function to add to your contract. You may need to update the Solidity syntax (e.g. use + instead of .add, * instead of .mul, etc). Deploy when you are done.
      */
-    function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns (uint256 yOutput) {}
+    function price(uint256 xInput, uint256 xReserves, uint256 yReserves) public pure returns (uint256 yOutput) {
+        // 1. Tính lượng đầu vào sau khi đã trừ phí 0.3%
+        uint256 xInputWithFee = xInput * 997;
+        
+        // 2. Tử số (Numerator) = Lượng vào (sau phí) * Dự trữ đầu ra
+        uint256 numerator = xInputWithFee * yReserves;
+        // 3. Mẫu số (Denominator) = (Dự trữ đầu vào * 1000) + Lượng vào (sau phí)
+        uint256 denominator = (xReserves * 1000) + xInputWithFee;
+        
+        // 4. Kết quả = Tử số / Mẫu số
+        return numerator / denominator;
+    }
 
     /**
      * @notice returns liquidity for a user.
