@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Corn: {
-      address: "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      address: "0x82e01223d51Eb87e16A03E24687EDF0F294da6f1",
       abi: [
         {
           inputs: [],
@@ -445,10 +445,10 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 21,
+      deployedOnBlock: 72,
     },
     CornDEX: {
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      address: "0x2bdCC0de6bE1f7D2ee689a0342D76F52E8EFABa3",
       abi: [
         {
           inputs: [
@@ -753,10 +753,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 23,
+      deployedOnBlock: 74,
     },
     Lending: {
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      address: "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0",
       abi: [
         {
           inputs: [
@@ -781,7 +781,17 @@ const deployedContracts = {
         },
         {
           inputs: [],
+          name: "Lending__InsufficientLiquidatorCorn",
+          type: "error",
+        },
+        {
+          inputs: [],
           name: "Lending__InvalidAmount",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "Lending__NotLiquidatable",
           type: "error",
         },
         {
@@ -1151,10 +1161,10 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 25,
+      deployedOnBlock: 76,
     },
     MovePrice: {
-      address: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
+      address: "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
       abi: [
         {
           inputs: [
@@ -1195,7 +1205,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 27,
+      deployedOnBlock: 78,
     },
   },
 } as const;

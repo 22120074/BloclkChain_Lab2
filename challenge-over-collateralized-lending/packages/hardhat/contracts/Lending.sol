@@ -195,5 +195,55 @@ contract Lending is Ownable {
      * @dev The caller must have enough CORN to pay back user's debt
      * @dev The caller must have approved this contract to transfer the debt
      */
-    function liquidate(address user) public {}
+    function liquidate(address user) public {
+        // 1. Kiểm tra xem người này có bị thanh lý được không
+        if (!isLiquidatable(user)) {
+            revert Lending__NotLiquidatable();
+        }
+
+        uint256 debt = s_userBorrowed[user];
+
+        // 2. Tính toán lượng ETH tương ứng với số nợ CORN
+        // Lấy dự trữ hiện tại từ DEX
+        uint256 cornReserve = i_corn.balanceOf(address(i_cornDEX));
+        uint256 ethReserve = address(i_cornDEX).balance;
+
+        // Hỏi DEX: "Với số nợ 'debt' CORN này thì đổi được bao nhiêu ETH?"
+        // Input: CORN (debt), ReserveInput: CORN, ReserveOutput: ETH
+        uint256 ethNeededToPayDebt = i_cornDEX.price(debt, cornReserve, ethReserve);
+
+        // 3. Tính tổng tài sản thế chấp sẽ bị tịch thu (Nợ + 10% thưởng)
+        // LIQUIDATOR_REWARD là 10 (khai báo ở đầu contract)
+        uint256 liquidatorReward = (ethNeededToPayDebt * LIQUIDATOR_REWARD) / 100;
+        uint256 totalCollateralToSeize = ethNeededToPayDebt + liquidatorReward;
+
+        // 4. Kiểm tra xem người dùng có đủ ETH để trả thưởng không
+        // Nếu không đủ thì lấy hết những gì họ có (trường hợp lỗ)
+        if (totalCollateralToSeize > s_userCollateral[user]) {
+            totalCollateralToSeize = s_userCollateral[user];
+        }
+
+        // 5. Kiểm tra Liquidator có đủ CORN để trả nợ thay không
+        if (i_corn.balanceOf(msg.sender) < debt) {
+            revert Lending__InsufficientLiquidatorCorn();
+        }
+
+        // 6. THỰC HIỆN GIAO DỊCH
+
+        // Trừ nợ của người dùng về 0
+        s_userBorrowed[user] = 0;
+
+        // Trừ tài sản thế chấp của người dùng
+        s_userCollateral[user] -= totalCollateralToSeize;
+
+        // Thu CORN từ Liquidator về Contract (Trả nợ)
+        bool successTransferCorn = i_corn.transferFrom(msg.sender, address(this), debt);
+        if (!successTransferCorn) revert Lending__RepayingFailed();
+
+        // Trả ETH (Thế chấp + Thưởng) cho Liquidator
+        (bool successTransferEth, ) = payable(msg.sender).call{ value: totalCollateralToSeize }("");
+        if (!successTransferEth) revert Lending__TransferFailed();
+
+        emit Liquidation(user, msg.sender, totalCollateralToSeize, debt, i_cornDEX.currentPrice());
+    }
 }
