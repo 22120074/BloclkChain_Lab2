@@ -45,13 +45,47 @@ contract Lending is Ownable {
     /**
      * @notice Allows users to add collateral to their account
      */
-    function addCollateral() public payable {}
+    function addCollateral() public payable {
+        if (msg.value == 0) {
+            revert Lending__InvalidAmount();
+        }
+
+        // Cập nhật số dư thế chấp của người dùng
+        s_userCollateral[msg.sender] += msg.value;
+
+        // Tạm thời để price là 0 vì chưa có logic tính giá
+        emit CollateralAdded(msg.sender, msg.value, 0);
+    }
 
     /**
      * @notice Allows users to withdraw collateral as long as it doesn't make them liquidatable
      * @param amount The amount of collateral to withdraw
      */
-    function withdrawCollateral(uint256 amount) public {}
+    function withdrawCollateral(uint256 amount) public {
+        if (amount == 0) {
+            revert Lending__InvalidAmount();
+        }
+        
+        // Kiểm tra số dư người dùng có đủ để rút không
+        if (s_userCollateral[msg.sender] < amount) {
+            revert Lending__InvalidAmount();
+        }
+
+        // Trừ số dư trước khi chuyển tiền (Checks-Effects-Interactions)
+        s_userCollateral[msg.sender] -= amount;
+
+        // Chuyển ETH về cho người dùng
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        if (!success) {
+            revert Lending__TransferFailed();
+        }
+
+        // Kiểm tra xem rút xong vị thế có an toàn không (Dùng cho các Checkpoint sau)
+        _validatePosition(msg.sender);
+
+        // Tạm thời để price là 0
+        emit CollateralWithdrawn(msg.sender, amount, 0);
+    }
 
     /**
      * @notice Calculates the total collateral value for a user based on their collateral balance
