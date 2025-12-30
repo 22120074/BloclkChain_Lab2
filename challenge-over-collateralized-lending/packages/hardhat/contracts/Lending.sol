@@ -138,13 +138,56 @@ contract Lending is Ownable {
      * @notice Allows users to borrow corn based on their collateral
      * @param borrowAmount The amount of corn to borrow
      */
-    function borrowCorn(uint256 borrowAmount) public {}
+    function borrowCorn(uint256 borrowAmount) public {
+        // 1. Kiểm tra đầu vào
+        if (borrowAmount == 0) {
+            revert Lending__InvalidAmount();
+        }
+
+        // 2. Tăng số nợ của người dùng
+        s_userBorrowed[msg.sender] += borrowAmount;
+
+        // 3. QUAN TRỌNG: Kiểm tra vị thế an toàn (Health Factor)
+        // Nếu vay quá 80% giá trị tài sản (tương ứng tỷ lệ < 120%), hàm này sẽ revert
+        _validatePosition(msg.sender);
+
+        // 4. Chuyển token CORN cho người dùng
+        bool success = i_corn.transfer(msg.sender, borrowAmount);
+        if (!success) {
+            revert Lending__BorrowingFailed();
+        }
+
+        // 5. Bắn sự kiện
+        emit AssetBorrowed(msg.sender, borrowAmount, i_cornDEX.currentPrice());
+    }
 
     /**
      * @notice Allows users to repay corn and reduce their debt
      * @param repayAmount The amount of corn to repay
      */
-    function repayCorn(uint256 repayAmount) public {}
+    function repayCorn(uint256 repayAmount) public {
+        // 1. Kiểm tra đầu vào
+        if (repayAmount == 0) {
+            revert Lending__InvalidAmount();
+        }
+
+        // 2. Không thể trả quá số nợ đang có
+        if (s_userBorrowed[msg.sender] < repayAmount) {
+            revert Lending__InvalidAmount(); // Hoặc dùng lỗi custom khác nếu muốn chi tiết hơn
+        }
+
+        // 3. Giảm nợ (Checks-Effects-Interactions pattern)
+        s_userBorrowed[msg.sender] -= repayAmount;
+
+        // 4. Thu hồi token CORN từ người dùng
+        bool success = i_corn.transferFrom(msg.sender, address(this), repayAmount);
+        if (!success) {
+            revert Lending__RepayingFailed();
+        }
+
+        // 5. Bắn sự kiện
+        emit AssetRepaid(msg.sender, repayAmount, i_cornDEX.currentPrice());
+    }
 
     /**
      * @notice Allows liquidators to liquidate unsafe positions
