@@ -46,15 +46,14 @@ contract Lending is Ownable {
      * @notice Allows users to add collateral to their account
      */
     function addCollateral() public payable {
-        if (msg.value == 0) {
-            revert Lending__InvalidAmount();
-        }
+        if (msg.value == 0) revert Lending__InvalidAmount();
 
-        // Cập nhật số dư thế chấp của người dùng
         s_userCollateral[msg.sender] += msg.value;
 
-        // Tạm thời để price là 0 vì chưa có logic tính giá
-        emit CollateralAdded(msg.sender, msg.value, 0);
+        // Lấy giá hiện tại từ DEX để truyền vào Event
+        uint256 price = i_cornDEX.currentPrice();
+
+        emit CollateralAdded(msg.sender, msg.value, price);
     }
 
     /**
@@ -62,29 +61,19 @@ contract Lending is Ownable {
      * @param amount The amount of collateral to withdraw
      */
     function withdrawCollateral(uint256 amount) public {
-        if (amount == 0) {
-            revert Lending__InvalidAmount();
-        }
-        
-        // Kiểm tra số dư người dùng có đủ để rút không
-        if (s_userCollateral[msg.sender] < amount) {
-            revert Lending__InvalidAmount();
-        }
+        if (amount == 0) revert Lending__InvalidAmount();
+        if (s_userCollateral[msg.sender] < amount) revert Lending__InvalidAmount();
 
-        // Trừ số dư trước khi chuyển tiền (Checks-Effects-Interactions)
         s_userCollateral[msg.sender] -= amount;
 
-        // Chuyển ETH về cho người dùng
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
-        if (!success) {
-            revert Lending__TransferFailed();
-        }
+        (bool success, ) = payable(msg.sender).call{ value: amount }("");
+        if (!success) revert Lending__TransferFailed();
 
-        // Kiểm tra xem rút xong vị thế có an toàn không (Dùng cho các Checkpoint sau)
+        // Sau khi rút, kiểm tra xem vị thế còn an toàn không
         _validatePosition(msg.sender);
 
-        // Tạm thời để price là 0
-        emit CollateralWithdrawn(msg.sender, amount, 0);
+        uint256 price = i_cornDEX.currentPrice();
+        emit CollateralWithdrawn(msg.sender, amount, price);
     }
 
     /**
@@ -92,27 +81,58 @@ contract Lending is Ownable {
      * @param user The address of the user to calculate the collateral value for
      * @return uint256 The collateral value
      */
-    function calculateCollateralValue(address user) public view returns (uint256) {}
+    function calculateCollateralValue(address user) public view returns (uint256) {
+        uint256 ethAmount = s_userCollateral[user];
+        if (ethAmount == 0) return 0;
+
+        // Lấy số dư hiện tại của DEX để tính toán giá theo công thức AMM
+        uint256 ethReserve = address(i_cornDEX).balance;
+        uint256 tokenReserve = i_corn.balanceOf(address(i_cornDEX));
+
+        // xInput: ethAmount, xReserves: ethReserve, yReserves: tokenReserve
+        return i_cornDEX.price(ethAmount, ethReserve, tokenReserve);
+    }
 
     /**
      * @notice Calculates the position ratio for a user to ensure they are within safe limits
      * @param user The address of the user to calculate the position ratio for
      * @return uint256 The position ratio
      */
-    function _calculatePositionRatio(address user) internal view returns (uint256) {}
+    function _calculatePositionRatio(address user) internal view returns (uint256) {
+        uint256 collateralValue = calculateCollateralValue(user);
+        uint256 debt = s_userBorrowed[user];
+
+        // Nếu không có nợ, tỷ lệ an toàn là vô cực (dùng số lớn nhất của uint256)
+        if (debt == 0) return type(uint256).max;
+
+        // Công thức: (Tài sản * 100) / Nợ
+        return (collateralValue * 100) / debt;
+    }
 
     /**
      * @notice Checks if a user's position can be liquidated
      * @param user The address of the user to check
      * @return bool True if the position is liquidatable, false otherwise
      */
-    function isLiquidatable(address user) public view returns (bool) {}
+    function isLiquidatable(address user) public view returns (bool) {
+        // Nếu không có nợ thì không bao giờ bị thanh lý
+        if (s_userBorrowed[user] == 0) return false;
+
+        uint256 ratio = _calculatePositionRatio(user);
+
+        // Nếu tỷ lệ < 120 (120%), nghĩa là tài sản không đủ đảm bảo an toàn
+        return ratio < COLLATERAL_RATIO;
+    }
 
     /**
      * @notice Internal view method that reverts if a user's position is unsafe
      * @param user The address of the user to validate
      */
-    function _validatePosition(address user) internal view {}
+    function _validatePosition(address user) internal view {
+        if (isLiquidatable(user)) {
+            revert Lending__UnsafePositionRatio();
+        }
+    }
 
     /**
      * @notice Allows users to borrow corn based on their collateral

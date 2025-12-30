@@ -785,6 +785,11 @@ const deployedContracts = {
           type: "error",
         },
         {
+          inputs: [],
+          name: "Lending__UnsafePositionRatio",
+          type: "error",
+        },
+        {
           inputs: [
             {
               internalType: "address",
