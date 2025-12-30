@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Corn: {
-      address: "0x162A433068F51e18b7d13932F27e66a3f99E6890",
+      address: "0xD8a5a9b31c3C0232E196d518E89Fd8bF83AcAd43",
       abi: [
         {
           inputs: [],
@@ -445,10 +445,10 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 85,
+      deployedOnBlock: 100,
     },
     CornDEX: {
-      address: "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+      address: "0xDC11f7E700A4c898AE5CAddB1082cFfa76512aDD",
       abi: [
         {
           inputs: [
@@ -753,10 +753,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 87,
+      deployedOnBlock: 102,
     },
     Lending: {
-      address: "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
+      address: "0x51A1ceB83B83F1985a81C295d1fF28Afef186E02",
       abi: [
         {
           inputs: [
@@ -1161,10 +1161,10 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 89,
+      deployedOnBlock: 104,
     },
     MovePrice: {
-      address: "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d",
+      address: "0x36b58F5C1969B7b6591D752ea6F5486D069010AB",
       abi: [
         {
           inputs: [
@@ -1205,7 +1205,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 91,
+      deployedOnBlock: 106,
     },
   },
 } as const;
