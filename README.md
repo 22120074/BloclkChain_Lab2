@@ -235,3 +235,61 @@ yarn generate
 Đăng nhập vào **Wallet** rồi mua **Liquid** từ **Dex Contact**. Bạn cũng có thể thực hiện các chức năng như biến đổi ETh, Token. **Depoit** và **Withdraw**
 
 ---
+
+# 🚩 Challenge 5: 💳🌽 Over-Collateralized Lending
+
+This is the fifth challenge in the Speedrun Ethereum curriculum. The goal is to understand and build a decentralized lending protocol that utilizes an over-collateralized model, similar to Aave or Compound.
+
+Instead of a traditional credit score, you will build a smart contract that allows users to deposit ETH as collateral to borrow $CORN (an ERC20 token), ensuring the system remains solvent through a mathematical liquidation mechanism.
+
+### 🌟 Live Demo
+
+- **Frontend (Vercel):** [https://challenge-over-collateralized.vercel.app/]
+
+---
+
+## 🚀 Features & Checkpoints Completed
+
+I have successfully completed Checkpoints 1 to 9
+
+- **Alert:**
+  Làm đến phần này em mới ra mình chưa bỏ **onlyLocalBurnerWallet: true** ra ở các bài khác.
+
+---
+
+## 💻 How to Run Locally
+
+1. **Clone the repo & install dependencies:**
+
+```bash
+yarn install
+```
+
+2. **How to run the code:**
+
+```bash
+# CMD 1
+yarn chain
+```
+
+```bash
+# CMD 2
+yarn deloy --reset
+yarn deloy
+```
+
+```bash
+# CMD 3
+yarn start
+```
+
+```bash
+yarn account
+yarn generate
+```
+
+3. **Test in FE:**
+
+Thực hiện các chức năng như BorrowCorn, AddColl..., đến vượt hạn mức để isLiquid là true rồi sau đó rút ra.
+
+---
