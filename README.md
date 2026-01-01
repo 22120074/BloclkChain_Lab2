@@ -293,3 +293,54 @@ yarn generate
 Thực hiện các chức năng như BorrowCorn, AddColl..., đến vượt hạn mức để isLiquid là true rồi sau đó rút ra.
 
 ---
+
+# 🚩 Challenge 6: 💰 MyUSD Stablecoin
+
+This challenge is a deep dive into the mechanics of decentralized stablecoins and over-collateralized lending. You will build a system where users can lock up ETH to mint a stablecoin called MyUSD, ensuring the peg is maintained through mathematical health factors and liquidation incentives.
+
+### 🌟 Live Demo
+
+- **Frontend (Vercel):** []
+
+---
+
+## 🚀 Features & Checkpoints Completed
+
+I have successfully completed Checkpoints 1 to 7
+
+---
+
+## 💻 How to Run Locally
+
+1. **Clone the repo & install dependencies:**
+
+```bash
+yarn install
+```
+
+2. **How to run the code:**
+
+```bash
+# CMD 1
+yarn chain
+```
+
+```bash
+# CMD 2
+yarn deloy --reset
+yarn deloy
+```
+
+```bash
+# CMD 3
+yarn start
+```
+
+```bash
+yarn account
+yarn generate
+```
+
+3. **Test in FE:**
+
+---
